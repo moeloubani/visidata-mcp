@@ -18,11 +18,42 @@ from typing import Any, Dict, List, Optional, Union
 import visidata as vd
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp import Context
+import warnings
 
-# Initialize VisiData with headless mode
-vd.options.batch = True  # Run in batch mode
-vd.options.confirm_overwrite = False  # Don't ask for confirmations
-vd.options.header = 1  # Assume first row is header by default
+# Suppress VisiData warnings and output
+warnings.filterwarnings("ignore")
+
+# Redirect VisiData's stderr to suppress warnings
+class NullWriter:
+    def write(self, txt): pass
+    def flush(self): pass
+
+# Temporarily redirect stderr during VisiData initialization
+original_stderr = sys.stderr
+sys.stderr = NullWriter()
+
+try:
+    # Initialize VisiData with headless mode
+    vd.options.batch = True  # Run in batch mode
+    vd.options.header = 1  # Assume first row is header by default
+    
+    # Try to set confirm_overwrite option if it exists
+    try:
+        vd.options.confirm_overwrite = False  # Don't ask for confirmations
+    except (AttributeError, Exception):
+        # Option doesn't exist in this VisiData version, ignore
+        pass
+        
+    # Suppress VisiData's verbose output
+    try:
+        vd.options.debug = False
+        vd.options.verbose = False
+    except (AttributeError, Exception):
+        pass
+        
+finally:
+    # Restore stderr
+    sys.stderr = original_stderr
 
 # Create the MCP server
 mcp = FastMCP("VisiData")
@@ -966,7 +997,7 @@ Please be thorough and provide actionable insights.
 
 def main():
     """Main entry point for the VisiData MCP server."""
-    asyncio.run(mcp.run())
+    mcp.run()
 
 
 if __name__ == "__main__":

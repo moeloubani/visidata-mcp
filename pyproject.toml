@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "visidata-mcp"
-version = "0.1.1"
+version = "0.1.4"
 description = "MCP server for VisiData - a terminal spreadsheet multitool for discovering and arranging tabular data"
 authors = [
     { name = "Moe Loubani", email = "moe@moe.ca" }
