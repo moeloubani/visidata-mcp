@@ -30,7 +30,7 @@ npm pack
 # This creates a .tgz file you can inspect
 
 # Test installation locally
-npm install -g ./visidata-mcp-0.1.0-beta.1.tgz
+npm install -g ./@moeloubani-visidata-mcp-0.1.0-beta.1.tgz
 
 # Test the command
 visidata-mcp --help
@@ -39,7 +39,7 @@ visidata-mcp --help
 npm test
 
 # Cleanup
-npm uninstall -g visidata-mcp
+npm uninstall -g @moeloubani/visidata-mcp
 ```
 
 ### 3. Publish Beta Version
@@ -48,18 +48,17 @@ npm uninstall -g visidata-mcp
 # Publish to the beta tag
 npm publish --tag beta
 
-# Or if this is the first time
-npm publish --access public --tag beta
+# Note: --access public is automatic for scoped packages
 ```
 
 ### 4. Verify Publication
 
 ```bash
 # Check if published
-npm view visidata-mcp
+npm view @moeloubani/visidata-mcp
 
 # Install and test from npm
-npm install -g visidata-mcp@beta
+npm install -g @moeloubani/visidata-mcp@beta
 visidata-mcp --help
 npm test
 ```
@@ -69,12 +68,12 @@ npm test
 ### Beta Versions
 - Use format: `0.1.0-beta.1`, `0.1.0-beta.2`, etc.
 - Publish with `--tag beta`
-- Users install with `npm install -g visidata-mcp@beta`
+- Users install with `npm install -g @moeloubani/visidata-mcp@beta`
 
 ### Stable Versions
 - Use format: `0.1.0`, `0.2.0`, etc.
 - Publish with `npm publish` (no tag = latest)
-- Users install with `npm install -g visidata-mcp`
+- Users install with `npm install -g @moeloubani/visidata-mcp`
 
 ### Updating Versions
 
@@ -103,13 +102,13 @@ Test on different platforms:
 
 ```bash
 # macOS
-npm install -g visidata-mcp@beta
+npm install -g @moeloubani/visidata-mcp@beta
 
 # Ubuntu/Linux
-sudo npm install -g visidata-mcp@beta
+sudo npm install -g @moeloubani/visidata-mcp@beta
 
 # Windows (PowerShell as Administrator)
-npm install -g visidata-mcp@beta
+npm install -g @moeloubani/visidata-mcp@beta
 ```
 
 ### 3. Promote Beta to Stable
@@ -118,7 +117,7 @@ When ready to promote beta to stable:
 
 ```bash
 # Add latest tag to the beta version
-npm dist-tag add visidata-mcp@0.1.0-beta.1 latest
+npm dist-tag add @moeloubani/visidata-mcp@0.1.0-beta.1 latest
 
 # Or publish a new stable version
 npm version 0.1.0  # Remove -beta.1
@@ -135,11 +134,7 @@ npm config set prefix '~/.local'
 ```
 
 ### Package Already Exists
-```bash
-# If package name is taken, you might need to scope it
-npm init --scope=@yourusername
-# Then package becomes @yourusername/visidata-mcp
-```
+The package is already scoped to @moeloubani/visidata-mcp, so name conflicts are unlikely.
 
 ### Testing Different Node Versions
 ```bash
@@ -158,16 +153,16 @@ npm test
 # Complete publish workflow
 npm login
 npm test
-npm pack && tar -tzf visidata-mcp-*.tgz  # inspect contents
+npm pack && tar -tzf @moeloubani-visidata-mcp-*.tgz  # inspect contents
 npm publish --tag beta
-npm view visidata-mcp
-npm install -g visidata-mcp@beta && npm test
+npm view @moeloubani/visidata-mcp
+npm install -g @moeloubani/visidata-mcp@beta && npm test
 ```
 
 ## Notes
 
 - The npm package is a wrapper around the Python package
 - It automatically installs the Python dependencies
-- Users only need `npm install -g visidata-mcp@beta` to get started
+- Users only need `npm install -g @moeloubani/visidata-mcp@beta` to get started
 - The package works on macOS, Linux, and Windows
 - Python 3.8+ is still required but the npm package checks and guides users 

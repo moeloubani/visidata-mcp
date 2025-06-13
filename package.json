@@ -1,5 +1,5 @@
 {
-  "name": "visidata-mcp",
+  "name": "@moeloubani/visidata-mcp",
   "version": "0.1.0-beta.1",
   "description": "MCP server for VisiData - a terminal spreadsheet multitool for discovering and arranging tabular data",
   "keywords": [
@@ -13,7 +13,10 @@
     "excel",
     "data-visualization"
   ],
-  "author": "Moe Loubani",
+  "author": {
+    "name": "Moe Loubani",
+    "email": "moe@moe.ca"
+  },
   "license": "MIT",
   "repository": {
     "type": "git",

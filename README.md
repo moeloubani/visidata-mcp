@@ -44,7 +44,7 @@ VisiData supports a wide variety of data formats:
 The easiest way to install visidata-mcp is via npm. This automatically handles Python dependencies and setup:
 
 ```bash
-npm install -g visidata-mcp@beta
+npm install -g @moeloubani/visidata-mcp@beta
 ```
 
 **Prerequisites**: Python 3.8+ (the installer will check and guide you if needed)
@@ -66,7 +66,7 @@ pip install visidata-mcp
 #### Install from Source
 
 ```bash
-git clone https://github.com/your-username/visidata-mcp.git
+git clone https://github.com/moeloubani/visidata-mcp.git
 cd visidata-mcp
 pip install -e .
 ```
