@@ -1,0 +1,56 @@
+{
+  "name": "visidata-mcp",
+  "version": "0.1.0-beta.1",
+  "description": "MCP server for VisiData - a terminal spreadsheet multitool for discovering and arranging tabular data",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "visidata",
+    "data-analysis",
+    "spreadsheet",
+    "csv",
+    "json",
+    "excel",
+    "data-visualization"
+  ],
+  "author": "Moe Loubani",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moeloubani/visidata-mcp.git"
+  },
+  "homepage": "https://github.com/moeloubani/visidata-mcp",
+  "bugs": {
+    "url": "https://github.com/moeloubani/visidata-mcp/issues"
+  },
+  "bin": {
+    "visidata-mcp": "./bin/visidata-mcp.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=14"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "scripts": {
+    "preinstall": "node scripts/check-python.js",
+    "postinstall": "node scripts/install-python-package.js",
+    "test": "node scripts/test.js",
+    "uninstall": "node scripts/uninstall.js"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "preferGlobal": true,
+  "publishConfig": {
+    "access": "public",
+    "tag": "beta"
+  }
+} 

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "visidata": {
+      "command": "/full/path/to/visidata-mcp/venv/bin/python",
+      "args": ["-m", "visidata_mcp.server"],
+      "cwd": "/full/path/to/visidata-mcp"
+    }
+  }
+} 

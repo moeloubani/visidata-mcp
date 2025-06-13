@@ -1,0 +1,16 @@
+name,age,city,salary,department,hire_date
+Alice Johnson,28,New York,75000,Engineering,2022-03-15
+Bob Smith,35,San Francisco,85000,Marketing,2021-07-20
+Carol Davis,42,Chicago,95000,Sales,2020-11-08
+David Wilson,31,Austin,72000,Engineering,2023-01-12
+Eve Brown,29,Seattle,78000,Design,2022-09-03
+Frank Miller,38,Boston,88000,Marketing,2021-04-25
+Grace Lee,26,Portland,68000,Engineering,2023-06-18
+Henry Taylor,45,Denver,92000,Sales,2019-12-05
+Iris Chen,33,Los Angeles,80000,Design,2022-11-30
+Jack Anderson,27,Miami,70000,Marketing,2023-02-14
+Kate Thompson,39,Philadelphia,89000,Engineering,2020-08-17
+Liam Garcia,32,San Diego,76000,Sales,2022-05-22
+Maya Patel,30,Atlanta,77000,Design,2021-10-09
+Noah Rodriguez,41,Phoenix,91000,Marketing,2020-03-28
+Olivia Martinez,34,Dallas,83000,Engineering,2021-12-11 
