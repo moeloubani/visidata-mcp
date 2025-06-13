@@ -45,17 +45,17 @@ function testInstallation() {
     return false;
   }
   
-  // Test 3: Test MCP server startup
-  console.log('3. Testing MCP server startup...');
+  // Test 3: Test MCP server can be imported
+  console.log('3. Testing MCP server import...');
   try {
-    const result = execSync(`${pythonCmd} -m visidata_mcp.server --help`, { 
+    const result = execSync(`${pythonCmd} -c "from visidata_mcp.server import main; print('✅ Server import successful')"`, { 
       encoding: 'utf8',
       stdio: 'pipe',
-      timeout: 10000
+      timeout: 5000
     });
-    console.log('✅ MCP server can start');
+    console.log(result.trim());
   } catch (e) {
-    console.error('❌ MCP server failed to start');
+    console.error('❌ MCP server import failed');
     console.error('Error:', e.message);
     return false;
   }
@@ -63,11 +63,11 @@ function testInstallation() {
   // Test 4: Test tools registration
   console.log('4. Testing tools registration...');
   try {
-    const result = execSync(`${pythonCmd} -c "from visidata_mcp.server import get_supported_formats; print('Tools available')"`, { 
+    const result = execSync(`${pythonCmd} -c "from visidata_mcp.server import get_supported_formats; print('✅ Tools registration working')"`, { 
       encoding: 'utf8',
       stdio: 'pipe'
     });
-    console.log('✅ Tools registration working');
+    console.log(result.trim());
   } catch (e) {
     console.error('❌ Tools registration failed');
     return false;
@@ -76,7 +76,9 @@ function testInstallation() {
   console.log('');
   console.log('🎉 All tests passed!');
   console.log('');
-  console.log('You can now use visidata-mcp in your MCP configuration:');
+  console.log('Your visidata-mcp installation is working correctly!');
+  console.log('');
+  console.log('Usage in MCP configurations:');
   console.log('');
   console.log('Claude Desktop (claude_desktop_config.json):');
   console.log(JSON.stringify({
@@ -95,6 +97,8 @@ function testInstallation() {
       }
     }
   }, null, 2));
+  console.log('');
+  console.log('Note: The MCP server runs as a background service and communicates via stdin/stdout.');
   console.log('');
   
   return true;

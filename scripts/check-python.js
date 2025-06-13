@@ -20,9 +20,9 @@ function checkPython() {
         pythonCmd = candidate;
         pythonVersion = result.trim();
         
-        // Check if version is 3.8+
+        // Check if version is 3.10+
         const versionMatch = result.match(/Python 3\.(\d+)/);
-        if (versionMatch && parseInt(versionMatch[1]) >= 8) {
+        if (versionMatch && parseInt(versionMatch[1]) >= 10) {
           console.log(`✅ Found compatible Python: ${pythonVersion}`);
           return true;
         }
@@ -33,13 +33,13 @@ function checkPython() {
   }
   
   if (pythonCmd) {
-    console.error(`❌ Found Python (${pythonVersion}) but version 3.8+ is required`);
+    console.error(`❌ Found Python (${pythonVersion}) but version 3.10+ is required`);
   } else {
-    console.error('❌ Python 3.8+ is required but not found');
+    console.error('❌ Python 3.10+ is required but not found');
   }
   
   console.error('');
-  console.error('Please install Python 3.8 or higher:');
+  console.error('Please install Python 3.10 or higher:');
   console.error('  macOS: brew install python3');
   console.error('  Ubuntu/Debian: sudo apt install python3 python3-pip');
   console.error('  Windows: Download from https://python.org');

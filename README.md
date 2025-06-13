@@ -47,10 +47,10 @@ The easiest way to install visidata-mcp is via npm. This automatically handles P
 npm install -g @moeloubani/visidata-mcp@beta
 ```
 
-**Prerequisites**: Python 3.8+ (the installer will check and guide you if needed)
+**Prerequisites**: Python 3.10+ (the installer will check and guide you if needed)
 
 **That's it!** The npm package automatically:
-- ✅ Checks for Python 3.8+ 
+- ✅ Checks for Python 3.10+ 
 - ✅ Installs the Python package and all dependencies
 - ✅ Creates a global `visidata-mcp` command
 - ✅ Works with both Claude Desktop and Cursor

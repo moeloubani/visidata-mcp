@@ -964,5 +964,10 @@ Please be thorough and provide actionable insights.
 """
 
 
+def main():
+    """Main entry point for the VisiData MCP server."""
+    asyncio.run(mcp.run())
+
+
 if __name__ == "__main__":
-    asyncio.run(mcp.run()) 
+    main() 
