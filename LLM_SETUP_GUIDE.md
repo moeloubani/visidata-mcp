@@ -1,135 +1,44 @@
 # VisiData MCP Setup Guide for LLM Assistants
 
-**Purpose**: This guide is designed for LLM assistants to read and use when helping users set up VisiData MCP server.
+**Purpose**: This guide helps LLM assistants walk users through setting up VisiData MCP server with their AI application.
 
-**How to use this guide**: When a user asks for setup help, read this entire guide and walk them through the appropriate steps based on their system and preferences.
-
-**📋 Latest Version**: This guide is always up-to-date at: https://github.com/moeloubani/visidata-mcp/blob/main/LLM_SETUP_GUIDE.md
+**📋 Latest Version**: https://github.com/moeloubani/visidata-mcp/blob/main/LLM_SETUP_GUIDE.md
 
 ---
 
-## Step 1: System Requirements Check
+## Simple 2-Step Process
 
-### Ask the user to run these commands:
+### Step 1: Install VisiData MCP
 
+**Ask the user to run:**
 ```bash
-# Check Python version (must be 3.10+)
-python3 --version
-
-# Check if they have pipx (recommended)
-pipx --version
-
-# Check if they have npm (alternative method)
-npm --version
+npm install -g @moeloubani/visidata-mcp
 ```
 
-### Expected responses:
-- **Python 3.10+**: ✅ Proceed
-- **Python < 3.10 or not found**: ❌ User needs to install Python 3.10+
-- **pipx found**: ✅ Recommend pipx installation
-- **pipx not found**: Recommend installing pipx first
-- **npm found**: Alternative installation method available
+**What to expect:**
+- ✅ Downloads and installs the package
+- ✅ May show warnings about Python - this is normal
+- ✅ Creates global `visidata-mcp` command
+
+**If they get an error:**
+- **"npm not found"**: They need to install Node.js first from https://nodejs.org
+- **Permission errors**: They may need `sudo npm install -g @moeloubani/visidata-mcp`
 
 ---
 
-## Step 2: Installation Method Selection
+### Step 2: Configure Their AI Application
 
-### Recommend based on user's system:
+**Ask which AI application they're using, then follow the appropriate section:**
 
-#### Option A: pipx Installation (RECOMMENDED)
-**When to recommend**: User has Python 3.10+ and either has pipx or can install it
+#### For Cursor AI
 
-**Steps to guide user through:**
-
-1. **Install pipx if not present:**
+1. **Navigate to their project directory**
+2. **Create configuration file:**
    ```bash
-   # macOS with Homebrew
-   brew install pipx
-   
-   # Or with pip
-   python3 -m pip install --user pipx
-   ```
-
-2. **Install visidata-mcp:**
-   ```bash
-   pipx install visidata-mcp
-   ```
-
-3. **Verify installation:**
-   ```bash
-   # Check if command exists
-   which visidata-mcp
-   
-   # Should show: /Users/[username]/.local/bin/visidata-mcp
-   ```
-
-#### Option B: npm Installation
-**When to recommend**: User has npm and prefers npm, OR pipx installation fails
-
-**Steps:**
-1. **Install the package:**
-   ```bash
-   npm install -g @moeloubani/visidata-mcp@beta
-   ```
-
-2. **Check for issues:**
-   ```bash
-   # Test the command
-   visidata-mcp --help
-   ```
-
-**Common issue**: If you see "externally-managed-environment" error, switch to pipx method.
-
----
-
-## Step 3: Find the Correct Command Path
-
-### CRITICAL: Multiple versions can conflict
-
-**Have user run:**
-```bash
-# See which version is found first
-which visidata-mcp
-
-# List all versions
-ls -la ~/.local/bin/visidata-mcp 2>/dev/null || echo "No pipx version"
-ls -la ~/.nvm/versions/node/*/bin/visidata-mcp 2>/dev/null || echo "No npm version"
-```
-
-### Interpret results:
-- **If `which visidata-mcp` shows npm path**: May be broken, check if pipx version exists
-- **If `which visidata-mcp` shows pipx path**: Good, should work
-- **If multiple versions exist**: Recommend using full path to avoid conflicts
-
----
-
-## Step 4: Configure MCP Client
-
-### For Cursor AI:
-
-1. **Create configuration file:**
-   ```bash
-   # Navigate to project directory
-   cd /path/to/your/project
-   
-   # Create .cursor directory if it doesn't exist
    mkdir -p .cursor
    ```
 
-2. **Create `.cursor/mcp.json` with this content:**
-
-   **RECOMMENDED (full path):**
-   ```json
-   {
-     "mcpServers": {
-       "visidata": {
-         "command": "/Users/[USERNAME]/.local/bin/visidata-mcp"
-       }
-     }
-   }
-   ```
-
-   **Alternative (if sure about PATH):**
+3. **Create `.cursor/mcp.json` with this content:**
    ```json
    {
      "mcpServers": {
@@ -140,159 +49,166 @@ ls -la ~/.nvm/versions/node/*/bin/visidata-mcp 2>/dev/null || echo "No npm versi
    }
    ```
 
-3. **Replace `[USERNAME]`** with their actual username. Get it with: `echo $USER`
+4. **Restart Cursor completely** (Cmd+Q and reopen)
 
-### For Claude Desktop:
+#### For Windsurf
 
-1. **Find config file location:**
-   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-   - **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
+1. **Navigate to their project directory**
+2. **Create configuration file:**
+   ```bash
+   mkdir -p .windsurf
+   ```
 
-2. **Add to config file:**
+3. **Create `.windsurf/mcp.json` with this content:**
    ```json
    {
      "mcpServers": {
        "visidata": {
-         "command": "/Users/[USERNAME]/.local/bin/visidata-mcp"
+         "command": "visidata-mcp"
        }
      }
    }
    ```
 
----
+4. **Restart Windsurf completely**
 
-## Step 5: Test the Setup
+#### For Claude Desktop
 
-### Have user test the installation:
+1. **Find their config file location:**
+   - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+   - **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
 
-1. **Basic test:**
-   ```bash
-   # Test with MCP Inspector
-   npx @modelcontextprotocol/inspector /Users/[USERNAME]/.local/bin/visidata-mcp
+2. **Add this to the config file:**
+   ```json
+   {
+     "mcpServers": {
+       "visidata": {
+         "command": "visidata-mcp"
+       }
+     }
+   }
    ```
 
-2. **What to expect:**
-   - Browser opens with MCP Inspector
-   - Shows URL like: `http://localhost:6274/?MCP_PROXY_AUTH_TOKEN=...`
-   - Should display 8+ available tools
-   - User can test tools in the web interface
-
-3. **If MCP Inspector works:**
-   - ✅ Installation is correct
-   - ✅ Restart their AI application (Cursor/Claude Desktop)
-   - ✅ Look for "Available MCP Tools" in the chat
-
----
-
-## Troubleshooting Guide
-
-### Problem: "0 tools available" in AI application
-
-**Most common cause**: PATH conflict or wrong command path
-
-**Solution steps:**
-1. **Check which version is being used:**
-   ```bash
-   which visidata-mcp
-   ```
-
-2. **If it shows npm version but you want pipx:**
-   ```bash
-   # Use full path in config
-   /Users/[USERNAME]/.local/bin/visidata-mcp
-   ```
-
-3. **Verify the chosen version works:**
-   ```bash
-   # This should NOT hang or error
-   echo '{"jsonrpc":"2.0","id":1,"method":"ping"}' | /Users/[USERNAME]/.local/bin/visidata-mcp
-   ```
-
-4. **Always restart** the AI application completely after config changes
-
-### Problem: "externally-managed-environment" error
-
-**Cause**: npm version trying to install Python package in protected environment
-
-**Solution**: Switch to pipx installation method (Step 2, Option A)
-
-### Problem: Command hangs or runs forever
-
-**Cause**: MCP servers run indefinitely waiting for JSON-RPC input
-
-**Solution**: This is normal! Use Ctrl+C to stop. Test with MCP Inspector instead.
-
-### Problem: "Python package not found"
-
-**Cause**: Dependencies not installed properly
-
-**Solution**:
-1. **For pipx**: Reinstall with `pipx reinstall visidata-mcp`
-2. **For npm**: Switch to pipx method
-3. **Verify**: `python3 -c "import visidata_mcp; print('OK')"`
+3. **Restart Claude Desktop**
 
 ---
 
-## Success Indicators
+## Testing the Setup
 
-### User should see:
-1. ✅ **MCP Inspector shows 8+ tools** (load_data, analyze_data, convert_data, etc.)
-2. ✅ **AI application shows "Available MCP Tools"** in chat interface
-3. ✅ **Can use tools like**: "Please analyze this CSV file: /path/to/file.csv"
-4. ✅ **Tools return data** and don't show errors
+**Ask the user to:**
 
-### Tools available:
-- `load_data` - Load and inspect data files
-- `get_data_sample` - Get preview of data  
-- `analyze_data` - Comprehensive data analysis
-- `convert_data` - Convert between formats
-- `filter_data` - Filter data based on conditions
-- `get_column_stats` - Get column statistics
-- `sort_data` - Sort data by column
-- `get_supported_formats` - List supported formats
+1. **Restart their AI application** completely
+2. **Look for "Available MCP Tools"** or similar indicator in the chat interface
+3. **Try a simple test:** "Please analyze this data file: [path to a CSV file]"
+
+**Success indicators:**
+- ✅ AI application shows MCP tools are available
+- ✅ Can use commands like: load_data, analyze_data, convert_data
+- ✅ No "0 tools available" errors
+
+---
+
+## Troubleshooting
+
+### "0 tools available"
+
+**Most common cause**: Configuration not applied properly
+
+**Solutions:**
+1. **Double-check the config file path** and content
+2. **Restart the AI application completely** (not just reload)
+3. **Check the command works:** Run `visidata-mcp --version` in terminal
+
+### "Command not found: visidata-mcp"
+
+**Cause**: npm package not installed globally or PATH issue
+
+**Solutions:**
+1. **Reinstall:** `npm install -g @moeloubani/visidata-mcp`
+2. **Check global npm packages:** `npm list -g @moeloubani/visidata-mcp`
+3. **Check PATH:** Make sure npm global bin is in PATH
+
+### "Python package not found" or similar errors
+
+**Cause**: The npm package automatically installs Python dependencies
+
+**Solutions:**
+1. **Let it finish:** The first run may take a moment to set up Python packages
+2. **Check Python:** Make sure Python 3.10+ is installed
+3. **Manual install:** If needed, run `pip install visidata-mcp`
 
 ---
 
 ## Quick Reference Commands
 
-### For LLM to copy/paste to user:
-
+### Installation
 ```bash
-# Check system
-python3 --version && pipx --version
+# Install the package
+npm install -g @moeloubani/visidata-mcp
 
-# Install (recommended)
-pipx install visidata-mcp
+# Verify installation
+visidata-mcp --version
 
-# Find path
-which visidata-mcp
-echo $USER
+# Check if npm global packages are in PATH
+npm list -g @moeloubani/visidata-mcp
+```
 
-# Test installation
-npx @modelcontextprotocol/inspector ~/.local/bin/visidata-mcp
+### Configuration Templates
 
-# Configuration template (Cursor)
-mkdir -p .cursor
-cat > .cursor/mcp.json << 'EOF'
+**Cursor (.cursor/mcp.json):**
+```json
 {
   "mcpServers": {
     "visidata": {
-      "command": "/Users/USERNAME/.local/bin/visidata-mcp"
+      "command": "visidata-mcp"
     }
   }
 }
-EOF
 ```
 
-**Remember**: Replace `USERNAME` with actual username from `echo $USER`
+**Windsurf (.windsurf/mcp.json):**
+```json
+{
+  "mcpServers": {
+    "visidata": {
+      "command": "visidata-mcp"
+    }
+  }
+}
+```
+
+**Claude Desktop:**
+```json
+{
+  "mcpServers": {
+    "visidata": {
+      "command": "visidata-mcp"
+    }
+  }
+}
+```
 
 ---
 
-## Final Notes for LLM Assistants
+## Available Tools
 
-1. **Always ask user to restart** their AI application after configuration
-2. **Recommend full paths** to avoid PATH conflicts
-3. **Use MCP Inspector for testing** - it's the definitive test
-4. **If npm version fails**, immediately switch to pipx
-5. **Guide users step by step** - don't assume they know terminal commands
-6. **Verify each step** before moving to the next one 
+Once set up, users will have access to these data analysis tools:
+
+- **load_data** - Load and inspect data files
+- **get_data_sample** - Preview data 
+- **analyze_data** - Comprehensive data analysis
+- **convert_data** - Convert between formats (CSV, JSON, Excel, etc.)
+- **filter_data** - Filter data based on conditions
+- **sort_data** - Sort data by columns
+- **get_column_stats** - Get statistics for specific columns
+- **get_supported_formats** - List all supported file formats
+
+---
+
+## Notes for LLM Assistants
+
+1. **Keep it simple**: Just npm install + config file + restart
+2. **Focus on their specific AI app**: Only show the relevant configuration section
+3. **Always restart**: Emphasize the need to completely restart the AI application
+4. **Test with real data**: Suggest they try with an actual CSV file they have
+5. **One step at a time**: Don't overwhelm with all the options at once 
