@@ -1,9 +1,7 @@
 {
   "mcpServers": {
     "visidata": {
-      "command": "/Users/moe/Dev/visidata-mcp/venv/bin/python",
-      "args": ["-m", "visidata_mcp.server"],
-      "cwd": "/Users/moe/Dev/visidata-mcp"
+      "command": "/Users/moe/.local/bin/visidata-mcp"
     }
   }
 } 

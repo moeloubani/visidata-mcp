@@ -1,6 +1,6 @@
 {
   "name": "@moeloubani/visidata-mcp",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "MCP server for VisiData - a terminal spreadsheet multitool for discovering and arranging tabular data",
   "keywords": [
     "mcp",

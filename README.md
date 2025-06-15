@@ -39,6 +39,10 @@ VisiData supports a wide variety of data formats:
 
 ## Installation
 
+> 🤖 **For LLM-Assisted Setup**: If you're using an AI assistant to help with setup, point them to the [LLM Setup Guide](LLM_SETUP_GUIDE.md) for step-by-step instructions.
+
+> 🚀 **Interactive Setup**: Run `python3 setup_helper.py` for an interactive setup experience that will guide you through installation and configuration.
+
 ### 🚀 Quick Install (Recommended)
 
 The easiest way to install visidata-mcp is via npm. This automatically handles Python dependencies and setup:
@@ -55,7 +59,27 @@ npm install -g @moeloubani/visidata-mcp@beta
 - ✅ Creates a global `visidata-mcp` command
 - ✅ Works with both Claude Desktop and Cursor
 
-### Alternative: Python-only Install
+### Alternative: Python Install Methods
+
+#### 🐍 Install with pipx (Recommended for Python users)
+
+If you have an externally managed Python environment (common on macOS with Homebrew), use pipx:
+
+```bash
+# Install pipx if you don't have it
+brew install pipx  # macOS
+# or
+pip install --user pipx  # other systems
+
+# Install visidata-mcp
+pipx install visidata-mcp
+```
+
+**Benefits of pipx:**
+- ✅ Handles virtual environments automatically
+- ✅ Avoids conflicts with system Python
+- ✅ Works on externally managed Python environments
+- ✅ Creates global `visidata-mcp` command
 
 #### Install from PyPI
 
@@ -63,19 +87,23 @@ npm install -g @moeloubani/visidata-mcp@beta
 pip install visidata-mcp
 ```
 
+**Note**: If you get an "externally-managed-environment" error, use pipx instead (see above).
+
 #### Install from Source
 
 ```bash
 git clone https://github.com/moeloubani/visidata-mcp.git
 cd visidata-mcp
+pipx install .
+# or if you prefer pip:
 pip install -e .
 ```
 
 ## Usage
 
-### With Claude Desktop (npm install)
+### With Claude Desktop
 
-After installing via npm, simply add this to your Claude Desktop configuration:
+After installing via npm or pipx, add this to your Claude Desktop configuration:
 
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
@@ -90,7 +118,18 @@ After installing via npm, simply add this to your Claude Desktop configuration:
 }
 ```
 
-### With Cursor AI (npm install)
+**⚠️ PATH Issues**: If you have multiple versions installed (npm + pipx), use the full path:
+```json
+{
+  "mcpServers": {
+    "visidata": {
+      "command": "/Users/yourusername/.local/bin/visidata-mcp"
+    }
+  }
+}
+```
+
+### With Cursor AI
 
 Create `.cursor/mcp.json` in your project:
 
@@ -103,6 +142,21 @@ Create `.cursor/mcp.json` in your project:
   }
 }
 ```
+
+**⚠️ Recommended: Use Full Path**
+To avoid PATH conflicts, use the full path to the specific version you want:
+
+```json
+{
+  "mcpServers": {
+    "visidata": {
+      "command": "/Users/yourusername/.local/bin/visidata-mcp"
+    }
+  }
+}
+```
+
+Replace `yourusername` with your actual username. Find your path with: `which visidata-mcp` or `ls ~/.local/bin/visidata-mcp`
 
 **Restart your AI application** and you're ready to go! 🎉
 
@@ -159,19 +213,36 @@ Add the server to your Claude Desktop configuration:
 ### Direct Execution
 
 ```bash
-# Run the server directly
+# Run the server directly (runs indefinitely, use Ctrl+C to stop)
 visidata-mcp
 
 # Or with Python module
 python -m visidata_mcp.server
 ```
 
-### Development Mode
+**Note**: MCP servers run indefinitely and communicate via stdin/stdout. They're designed to be controlled by MCP clients, not run interactively. Use the MCP Inspector for testing.
+
+### Development and Testing
+
+#### Using MCP Inspector
+
+The MCP Inspector is a web-based tool for testing and debugging MCP servers:
 
 ```bash
-# Using MCP Inspector for debugging
+# Start the inspector (will open a browser)
 npx @modelcontextprotocol/inspector visidata-mcp
+
+# Or for pipx installations:
+npx @modelcontextprotocol/inspector ~/.local/bin/visidata-mcp
 ```
+
+The inspector will start and provide a URL with authentication token:
+```
+🔗 Open inspector with token pre-filled:
+   http://localhost:6274/?MCP_PROXY_AUTH_TOKEN=your-token-here
+```
+
+**Note**: The MCP server runs indefinitely and doesn't respond to `--help` or similar commands. It's designed to be controlled by MCP clients or the inspector.
 
 ## Example Usage
 
@@ -215,10 +286,41 @@ sort_data("/path/to/sales_data.csv", "date", False, "/path/to/sorted_data.csv")
 
 ### Common Issues
 
+#### "externally-managed-environment" Error
+If you see this error when trying to install:
+```
+error: externally-managed-environment
+× This environment is externally managed
+```
+
+**Solution**: Use pipx instead of pip:
+```bash
+pipx install visidata-mcp
+```
+
+This is common on macOS with Homebrew Python and protects your system Python installation.
+
 #### "0 tools available" in Cursor
-- **Solution**: Ensure you're using the full path to your virtual environment's Python in the MCP configuration
-- **Example**: Use `/path/to/visidata-mcp/venv/bin/python` instead of just `python`
-- Restart Cursor completely after changing the configuration
+- **Most common cause**: PATH conflict between npm and pipx versions
+- **Solution**: Use the full path to ensure you get the working version:
+  ```json
+  {
+    "mcpServers": {
+      "visidata": {
+        "command": "/Users/yourusername/.local/bin/visidata-mcp"
+      }
+    }
+  }
+  ```
+- **Check which version**: Run `which visidata-mcp` to see which version is found first
+- **For development**: Use the full path to your virtual environment's Python
+- **Always restart** Cursor completely after changing the configuration
+
+#### Server Won't Start or Hangs
+- **MCP servers run indefinitely**: They don't respond to `--help` or exit normally
+- **Test with MCP Inspector**: Use `npx @modelcontextprotocol/inspector visidata-mcp`
+- **Check dependencies**: `pipx list` to see if visidata-mcp is properly installed
+- **Verify installation**: Try importing in Python: `python3 -c "import visidata_mcp.server"`
 
 #### VisiData Warning Messages
 You may see warnings like:
@@ -227,36 +329,58 @@ setting unknown option confirm_overwrite
 ```
 These warnings are **harmless** and don't affect functionality. They occur because the MCP server sets VisiData options that may not be recognized in all versions.
 
-#### Server Not Starting
-- Verify your virtual environment has all dependencies: `pip list | grep visidata`
-- Check that Python 3.8+ is being used: `python --version`
-- Try running the server directly: `python -m visidata_mcp.server`
-
 #### Permission Errors
-- Ensure the virtual environment Python executable is accessible
-- Check file permissions on your project directory
-- Try running with `python -m visidata_mcp.server` to test manually
+- Ensure the command path is accessible
+- For pipx: Check that `~/.local/bin` is in your PATH
+- For development: Check file permissions on your project directory
+
+## Setup Resources
+
+This repository includes several resources to help with setup:
+
+- **[LLM_SETUP_GUIDE.md](LLM_SETUP_GUIDE.md)**: Comprehensive guide for AI assistants to help users with setup
+- **[setup_helper.py](setup_helper.py)**: Interactive Python script that guides users through installation
+- **[README.md](README.md)**: Main documentation (this file)
 
 ### Testing Your Installation
 
-Run the comprehensive verification script to check your entire setup:
+#### Quick Test (Recommended)
+
+Test that the installation works:
+
+```bash
+# Check that the command is available
+which visidata-mcp
+
+# Test with MCP Inspector (opens in browser)
+npx @modelcontextprotocol/inspector visidata-mcp
+```
+
+The inspector will show you all available tools and let you test them interactively.
+
+#### Verify Python Module Import
+
+```bash
+# Test that Python can import the module
+python3 -c "import visidata_mcp.server; print('✅ visidata-mcp installed correctly')"
+```
+
+#### For Development/Source Installs
+
+If you're working with the source code:
+
 ```bash
 cd /path/to/visidata-mcp
 source venv/bin/activate
 python verify_setup.py
 ```
 
-This script will check:
+This comprehensive script checks:
 - Python version and virtual environment
 - Package installations
 - MCP server tools registration (should show **8 tools**)
 - Configuration files
 - Server startup capability
-
-For just testing tools registration:
-```bash
-python test_tools.py
-```
 
 ## API Reference
 
