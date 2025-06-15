@@ -23,9 +23,9 @@
 
 **When a user asks for help setting up VisiData MCP:**
 
-1. **Tell them to run**: `npm install -g @moeloubani/visidata-mcp`
+1. **Run the install command for them**: `npm install -g @moeloubani/visidata-mcp`
 2. **Ask which AI app they use**: Cursor, Windsurf, or Claude Desktop
-3. **Help them create the config file** for their specific app
+3. **Create the config file** for their specific app
 4. **Tell them to restart** their AI application completely
 
 **That's it! No cloning, no complex setup, just install + configure + restart.**
@@ -36,7 +36,7 @@
 
 ### Step 1: Install VisiData MCP
 
-**Tell the user to run this command:**
+**Run this command for the user:**
 ```bash
 npm install -g @moeloubani/visidata-mcp
 ```
@@ -63,7 +63,7 @@ npm install -g @moeloubani/visidata-mcp
 #### For Cursor AI
 
 1. **Navigate to their project directory**
-2. **Create configuration file:**
+2. **Create the configuration directory and file:**
    ```bash
    mkdir -p .cursor
    ```
@@ -79,12 +79,12 @@ npm install -g @moeloubani/visidata-mcp
    }
    ```
 
-4. **Restart Cursor completely** (Cmd+Q and reopen)
+4. **Tell them to restart Cursor completely** (Cmd+Q and reopen)
 
 #### For Windsurf
 
 1. **Navigate to their project directory**
-2. **Create configuration file:**
+2. **Create the configuration directory and file:**
    ```bash
    mkdir -p .windsurf
    ```
@@ -100,7 +100,7 @@ npm install -g @moeloubani/visidata-mcp
    }
    ```
 
-4. **Restart Windsurf completely**
+4. **Tell them to restart Windsurf completely**
 
 #### For Claude Desktop
 
@@ -238,8 +238,8 @@ Once set up, users will have access to these data analysis tools:
 ## Notes for LLM Assistants
 
 1. **NO CLONING**: Users never need to clone the GitHub repository
-2. **Just npm install**: One global npm install command is all they need
-3. **Config file only**: Help them create ONE config file for their AI app
+2. **Run commands for them**: Use terminal tools to run `npm install` and create config files
+3. **One config file**: Create ONE config file for their specific AI app
 4. **Always restart**: Emphasize completely restarting the AI application
 5. **Keep it simple**: Don't mention source installation, pipx, or other methods
 6. **Test with real data**: Suggest they try with an actual CSV file they have 
