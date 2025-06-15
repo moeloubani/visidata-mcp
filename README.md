@@ -39,7 +39,7 @@ VisiData supports a wide variety of data formats:
 
 ## Installation
 
-> 🤖 **For LLM-Assisted Setup**: If you're using an AI assistant to help with setup, point them to the [LLM Setup Guide](LLM_SETUP_GUIDE.md) for step-by-step instructions.
+> 🤖 **For LLM-Assisted Setup**: If you're using an AI assistant to help with setup, point them to the [LLM Setup Guide](https://github.com/moeloubani/visidata-mcp/blob/main/LLM_SETUP_GUIDE.md) for step-by-step instructions.
 
 > 🚀 **Interactive Setup**: Run `python3 setup_helper.py` for an interactive setup experience that will guide you through installation and configuration.
 

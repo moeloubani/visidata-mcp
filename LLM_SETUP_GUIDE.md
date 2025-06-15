@@ -4,6 +4,8 @@
 
 **How to use this guide**: When a user asks for setup help, read this entire guide and walk them through the appropriate steps based on their system and preferences.
 
+**📋 Latest Version**: This guide is always up-to-date at: https://github.com/moeloubani/visidata-mcp/blob/main/LLM_SETUP_GUIDE.md
+
 ---
 
 ## Step 1: System Requirements Check
