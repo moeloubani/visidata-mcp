@@ -6,14 +6,42 @@
 
 ---
 
+## ⚠️ IMPORTANT: DO NOT CLONE THE REPOSITORY
+
+**Users do NOT need to:**
+- Clone or download the GitHub repository
+- Install from source
+- Run any setup scripts
+
+**Users ONLY need to:**
+1. Install the npm package globally
+2. Configure their AI application
+
+---
+
+## 📋 Summary for LLM Assistants
+
+**When a user asks for help setting up VisiData MCP:**
+
+1. **Tell them to run**: `npm install -g @moeloubani/visidata-mcp`
+2. **Ask which AI app they use**: Cursor, Windsurf, or Claude Desktop
+3. **Help them create the config file** for their specific app
+4. **Tell them to restart** their AI application completely
+
+**That's it! No cloning, no complex setup, just install + configure + restart.**
+
+---
+
 ## Simple 2-Step Process
 
 ### Step 1: Install VisiData MCP
 
-**Ask the user to run:**
+**Tell the user to run this command:**
 ```bash
 npm install -g @moeloubani/visidata-mcp
 ```
+
+**This installs the package globally on their system - no cloning needed!**
 
 **What to expect:**
 - ✅ Downloads and installs the package
@@ -28,7 +56,9 @@ npm install -g @moeloubani/visidata-mcp
 
 ### Step 2: Configure Their AI Application
 
-**Ask which AI application they're using, then follow the appropriate section:**
+**Ask which AI application they're using, then help them create ONE config file:**
+
+**IMPORTANT**: Users need to create a config file in their project directory (for Cursor/Windsurf) or system config location (for Claude Desktop). They do NOT need to clone anything.
 
 #### For Cursor AI
 
@@ -207,8 +237,9 @@ Once set up, users will have access to these data analysis tools:
 
 ## Notes for LLM Assistants
 
-1. **Keep it simple**: Just npm install + config file + restart
-2. **Focus on their specific AI app**: Only show the relevant configuration section
-3. **Always restart**: Emphasize the need to completely restart the AI application
-4. **Test with real data**: Suggest they try with an actual CSV file they have
-5. **One step at a time**: Don't overwhelm with all the options at once 
+1. **NO CLONING**: Users never need to clone the GitHub repository
+2. **Just npm install**: One global npm install command is all they need
+3. **Config file only**: Help them create ONE config file for their AI app
+4. **Always restart**: Emphasize completely restarting the AI application
+5. **Keep it simple**: Don't mention source installation, pipx, or other methods
+6. **Test with real data**: Suggest they try with an actual CSV file they have 
