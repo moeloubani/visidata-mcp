@@ -45,19 +45,19 @@ VisiData supports a wide variety of data formats:
 
 ### 🚀 Quick Install (Recommended)
 
-The easiest way to install visidata-mcp is via npm. This automatically handles Python dependencies and setup:
+Install visidata-mcp via npm:
 
 ```bash
-npm install -g @moeloubani/visidata-mcp@beta
+npm install -g @moeloubani/visidata-mcp
 ```
 
-**Prerequisites**: Python 3.10+ (the installer will check and guide you if needed)
+**Prerequisites**: Node.js and Python 3.10+ (the installer will check and guide you if needed)
 
 **That's it!** The npm package automatically:
 - ✅ Checks for Python 3.10+ 
 - ✅ Installs the Python package and all dependencies
 - ✅ Creates a global `visidata-mcp` command
-- ✅ Works with both Claude Desktop and Cursor
+- ✅ Works with Cursor, Windsurf, and Claude Desktop
 
 ### Alternative: Python Install Methods
 
