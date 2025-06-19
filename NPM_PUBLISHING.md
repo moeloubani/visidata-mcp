@@ -15,7 +15,7 @@ This guide explains how to publish the visidata-mcp npm package.
 ### 1. Pre-publish Checklist
 
 - [ ] Ensure Python package is published to PyPI first
-- [ ] Update version in `package.json` (currently `0.1.0-beta.1`)
+- [ ] Update version in `package.json` (currently `0.1.7`)
 - [ ] Test the package locally
 - [ ] Update README.md if needed
 - [ ] Ensure all scripts have proper permissions
@@ -30,7 +30,7 @@ npm pack
 # This creates a .tgz file you can inspect
 
 # Test installation locally
-npm install -g ./@moeloubani-visidata-mcp-0.1.0-beta.1.tgz
+npm install -g ./moeloubani-visidata-mcp-0.1.6.tgz
 
 # Test the command
 visidata-mcp --help
@@ -42,13 +42,14 @@ npm test
 npm uninstall -g @moeloubani/visidata-mcp
 ```
 
-### 3. Publish Beta Version
+### 3. Publish Version
 
 ```bash
-# Publish to the beta tag
+# Publish to the beta tag (for testing)
 npm publish --tag beta
 
-# Note: --access public is automatic for scoped packages
+# Or publish as latest (for stable release)
+npm publish
 ```
 
 ### 4. Verify Publication
@@ -60,18 +61,17 @@ npm view @moeloubani/visidata-mcp
 # Install and test from npm
 npm install -g @moeloubani/visidata-mcp@beta
 visidata-mcp --help
-npm test
 ```
 
 ## Version Management
 
 ### Beta Versions
-- Use format: `0.1.0-beta.1`, `0.1.0-beta.2`, etc.
+- Use format: `0.1.6-beta.1`, `0.1.6-beta.2`, etc.
 - Publish with `--tag beta`
 - Users install with `npm install -g @moeloubani/visidata-mcp@beta`
 
 ### Stable Versions
-- Use format: `0.1.0`, `0.2.0`, etc.
+- Use format: `0.1.6`, `0.2.0`, etc.
 - Publish with `npm publish` (no tag = latest)
 - Users install with `npm install -g @moeloubani/visidata-mcp`
 
@@ -80,12 +80,12 @@ npm test
 ```bash
 # For beta
 npm version prerelease --preid=beta
-# This changes 0.1.0-beta.1 → 0.1.0-beta.2
+# This changes 0.1.6 → 0.1.7-beta.1
 
 # For stable release
-npm version patch  # 0.1.0 → 0.1.1
-npm version minor  # 0.1.0 → 0.2.0
-npm version major  # 0.1.0 → 1.0.0
+npm version patch  # 0.1.6 → 0.1.7
+npm version minor  # 0.1.6 → 0.2.0
+npm version major  # 0.1.6 → 1.0.0
 ```
 
 ## Post-Publication
@@ -102,13 +102,13 @@ Test on different platforms:
 
 ```bash
 # macOS
-npm install -g @moeloubani/visidata-mcp@beta
+npm install -g @moeloubani/visidata-mcp
 
 # Ubuntu/Linux
-sudo npm install -g @moeloubani/visidata-mcp@beta
+sudo npm install -g @moeloubani/visidata-mcp
 
 # Windows (PowerShell as Administrator)
-npm install -g @moeloubani/visidata-mcp@beta
+npm install -g @moeloubani/visidata-mcp
 ```
 
 ### 3. Promote Beta to Stable
@@ -117,34 +117,11 @@ When ready to promote beta to stable:
 
 ```bash
 # Add latest tag to the beta version
-npm dist-tag add @moeloubani/visidata-mcp@0.1.0-beta.1 latest
+npm dist-tag add @moeloubani/visidata-mcp@0.1.6-beta.1 latest
 
 # Or publish a new stable version
-npm version 0.1.0  # Remove -beta.1
+npm version 0.1.6  # Remove -beta.1
 npm publish
-```
-
-## Troubleshooting
-
-### Permission Errors
-```bash
-# If you get permission errors
-npm config set prefix '~/.local'
-# Then add ~/.local/bin to PATH
-```
-
-### Package Already Exists
-The package is already scoped to @moeloubani/visidata-mcp, so name conflicts are unlikely.
-
-### Testing Different Node Versions
-```bash
-# Use nvm to test different Node versions
-nvm use 14
-npm test
-nvm use 16
-npm test
-nvm use 18
-npm test
 ```
 
 ## Commands Summary
@@ -153,16 +130,16 @@ npm test
 # Complete publish workflow
 npm login
 npm test
-npm pack && tar -tzf @moeloubani-visidata-mcp-*.tgz  # inspect contents
+npm pack && tar -tzf moeloubani-visidata-mcp-*.tgz  # inspect contents
 npm publish --tag beta
 npm view @moeloubani/visidata-mcp
-npm install -g @moeloubani/visidata-mcp@beta && npm test
+npm install -g @moeloubani/visidata-mcp@beta
 ```
 
 ## Notes
 
 - The npm package is a wrapper around the Python package
-- It automatically installs the Python dependencies
-- Users only need `npm install -g @moeloubani/visidata-mcp@beta` to get started
+- It automatically installs the Python dependencies including matplotlib, seaborn, scipy
+- Users only need `npm install -g @moeloubani/visidata-mcp` to get started
 - The package works on macOS, Linux, and Windows
-- Python 3.8+ is still required but the npm package checks and guides users 
+- Python 3.10+ is required and the npm package checks and guides users 

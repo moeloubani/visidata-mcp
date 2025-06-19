@@ -20,6 +20,17 @@ from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp import Context
 import warnings
 
+# Try to import visualization packages early to detect missing dependencies
+try:
+    import matplotlib
+    matplotlib.use('Agg')  # Use non-interactive backend
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    VISUALIZATION_AVAILABLE = True
+except ImportError as e:
+    VISUALIZATION_AVAILABLE = False
+    VISUALIZATION_ERROR = f"Visualization libraries not available: {e}. Please install matplotlib and seaborn."
+
 # Suppress VisiData warnings and output
 warnings.filterwarnings("ignore")
 
@@ -560,9 +571,10 @@ def create_graph(file_path: str, x_column: str, y_column: str,
         Information about the created graph
     """
     try:
+        if not VISUALIZATION_AVAILABLE:
+            return f"Error: {VISUALIZATION_ERROR}"
+            
         import pandas as pd
-        import matplotlib.pyplot as plt
-        import seaborn as sns
         from pathlib import Path
         
         # Load the data
@@ -687,9 +699,10 @@ def create_correlation_heatmap(file_path: str, output_path: str,
         Information about the created heatmap
     """
     try:
+        if not VISUALIZATION_AVAILABLE:
+            return f"Error: {VISUALIZATION_ERROR}"
+            
         import pandas as pd
-        import matplotlib.pyplot as plt
-        import seaborn as sns
         from pathlib import Path
         
         # Load the data
@@ -769,9 +782,10 @@ def create_distribution_plots(file_path: str, output_path: str,
         Information about the created distribution plots
     """
     try:
+        if not VISUALIZATION_AVAILABLE:
+            return f"Error: {VISUALIZATION_ERROR}"
+            
         import pandas as pd
-        import matplotlib.pyplot as plt
-        import seaborn as sns
         from pathlib import Path
         import math
         
@@ -993,6 +1007,457 @@ Based on this analysis, provide:
 
 Please be thorough and provide actionable insights.
 """
+
+
+@mcp.tool()
+def parse_skills_column(file_path: str, skills_column: str, output_path: Optional[str] = None) -> str:
+    """
+    Parse comma-separated skills into individual skills and create one-hot encoding.
+    
+    Args:
+        file_path: Path to the data file
+        skills_column: Column name containing comma-separated skills
+        output_path: Optional path to save the processed data
+    
+    Returns:
+        Information about the parsed skills data
+    """
+    try:
+        import pandas as pd
+        from pathlib import Path
+        
+        # Load the data
+        file_extension = Path(file_path).suffix.lower()
+        if file_extension == '.csv':
+            df = pd.read_csv(file_path)
+        elif file_extension == '.json':
+            df = pd.read_json(file_path)
+        elif file_extension in ['.xlsx', '.xls']:
+            df = pd.read_excel(file_path)
+        elif file_extension == '.tsv':
+            df = pd.read_csv(file_path, sep='\t')
+        else:
+            df = pd.read_csv(file_path)
+        
+        if skills_column not in df.columns:
+            return f"Error: Column '{skills_column}' not found in data"
+        
+        # Parse skills and create one-hot encoding
+        all_skills = set()
+        
+        # Extract all unique skills
+        for skills_str in df[skills_column].dropna():
+            if pd.isna(skills_str):
+                continue
+            skills = [skill.strip() for skill in str(skills_str).split(',') if skill.strip()]
+            all_skills.update(skills)
+        
+        all_skills = sorted(list(all_skills))
+        
+        # Create one-hot encoding for each skill
+        skills_df = df.copy()
+        for skill in all_skills:
+            skills_df[f"skill_{skill.replace(' ', '_').replace('-', '_').lower()}"] = 0
+        
+        # Fill in the one-hot encoding
+        for idx, skills_str in enumerate(df[skills_column]):
+            if pd.isna(skills_str):
+                continue
+            skills = [skill.strip() for skill in str(skills_str).split(',') if skill.strip()]
+            for skill in skills:
+                col_name = f"skill_{skill.replace(' ', '_').replace('-', '_').lower()}"
+                if col_name in skills_df.columns:
+                    skills_df.loc[idx, col_name] = 1
+        
+        # Save processed data if output path provided
+        if output_path:
+            if output_path.endswith('.csv'):
+                skills_df.to_csv(output_path, index=False)
+            elif output_path.endswith('.json'):
+                skills_df.to_json(output_path, orient='records', indent=2)
+            elif output_path.endswith(('.xlsx', '.xls')):
+                skills_df.to_excel(output_path, index=False)
+            else:
+                skills_df.to_csv(output_path, index=False)
+        
+        result = {
+            "skills_parsed": True,
+            "original_column": skills_column,
+            "unique_skills_count": len(all_skills),
+            "unique_skills": all_skills[:20],  # First 20 skills for preview
+            "rows_processed": len(df),
+            "new_columns_added": len(all_skills),
+            "output_file": output_path if output_path else None
+        }
+        
+        return json.dumps(result, indent=2)
+        
+    except Exception as e:
+        return f"Error parsing skills: {str(e)}\n{traceback.format_exc()}"
+
+
+@mcp.tool()
+def analyze_skills_by_location(file_path: str, skills_column: str, location_column: str, 
+                              output_path: Optional[str] = None) -> str:
+    """
+    Analyze skills frequency and distribution by location.
+    
+    Args:
+        file_path: Path to the data file
+        skills_column: Column name containing comma-separated skills
+        location_column: Column name containing location information
+        output_path: Optional path to save the analysis results
+    
+    Returns:
+        Skills analysis by location
+    """
+    try:
+        import pandas as pd
+        from pathlib import Path
+        from collections import defaultdict, Counter
+        
+        # Load the data
+        file_extension = Path(file_path).suffix.lower()
+        if file_extension == '.csv':
+            df = pd.read_csv(file_path)
+        elif file_extension == '.json':
+            df = pd.read_json(file_path)
+        elif file_extension in ['.xlsx', '.xls']:
+            df = pd.read_excel(file_path)
+        elif file_extension == '.tsv':
+            df = pd.read_csv(file_path, sep='\t')
+        else:
+            df = pd.read_csv(file_path)
+        
+        if skills_column not in df.columns:
+            return f"Error: Column '{skills_column}' not found in data"
+        if location_column not in df.columns:
+            return f"Error: Column '{location_column}' not found in data"
+        
+        # Analyze skills by location
+        location_skills = defaultdict(list)
+        
+        for _, row in df.iterrows():
+            location = row[location_column]
+            skills_str = row[skills_column]
+            
+            if pd.isna(location) or pd.isna(skills_str):
+                continue
+                
+            skills = [skill.strip() for skill in str(skills_str).split(',') if skill.strip()]
+            location_skills[location].extend(skills)
+        
+        # Calculate statistics for each location
+        analysis_results = []
+        for location, skills_list in location_skills.items():
+            skill_counts = Counter(skills_list)
+            total_skills = len(skills_list)
+            unique_skills = len(skill_counts)
+            
+            # Top 10 most common skills for this location
+            top_skills = skill_counts.most_common(10)
+            
+            analysis_results.append({
+                "location": location,
+                "total_skill_mentions": total_skills,
+                "unique_skills": unique_skills,
+                "job_postings": sum(1 for _, row in df.iterrows() 
+                                 if row[location_column] == location and not pd.isna(row[skills_column])),
+                "top_skills": [{"skill": skill, "count": count, "percentage": round(count/total_skills*100, 2)} 
+                              for skill, count in top_skills]
+            })
+        
+        # Sort by total skill mentions
+        analysis_results.sort(key=lambda x: x["total_skill_mentions"], reverse=True)
+        
+        # Save analysis if output path provided
+        if output_path:
+            analysis_df = pd.DataFrame(analysis_results)
+            if output_path.endswith('.csv'):
+                analysis_df.to_csv(output_path, index=False)
+            elif output_path.endswith('.json'):
+                with open(output_path, 'w') as f:
+                    json.dump(analysis_results, f, indent=2)
+            elif output_path.endswith(('.xlsx', '.xls')):
+                analysis_df.to_excel(output_path, index=False)
+            else:
+                analysis_df.to_csv(output_path, index=False)
+        
+        result = {
+            "analysis_completed": True,
+            "locations_analyzed": len(analysis_results),
+            "total_locations": len(location_skills),
+            "analysis_data": analysis_results[:10],  # First 10 locations for preview
+            "output_file": output_path if output_path else None
+        }
+        
+        return json.dumps(result, indent=2)
+        
+    except Exception as e:
+        return f"Error analyzing skills by location: {str(e)}\n{traceback.format_exc()}"
+
+
+@mcp.tool()
+def create_skills_location_heatmap(file_path: str, skills_column: str, location_column: str, 
+                                  output_path: str, top_skills: int = 15, top_locations: int = 10) -> str:
+    """
+    Create a heatmap showing skills distribution across locations.
+    
+    Args:
+        file_path: Path to the data file
+        skills_column: Column name containing comma-separated skills
+        location_column: Column name containing location information
+        output_path: Path where to save the heatmap image
+        top_skills: Number of top skills to include (default: 15)
+        top_locations: Number of top locations to include (default: 10)
+    
+    Returns:
+        Information about the created skills-location heatmap
+    """
+    try:
+        if not VISUALIZATION_AVAILABLE:
+            return f"Error: {VISUALIZATION_ERROR}"
+            
+        import pandas as pd
+        from pathlib import Path
+        from collections import defaultdict, Counter
+        
+        # Load the data
+        file_extension = Path(file_path).suffix.lower()
+        if file_extension == '.csv':
+            df = pd.read_csv(file_path)
+        elif file_extension == '.json':
+            df = pd.read_json(file_path)
+        elif file_extension in ['.xlsx', '.xls']:
+            df = pd.read_excel(file_path)
+        elif file_extension == '.tsv':
+            df = pd.read_csv(file_path, sep='\t')
+        else:
+            df = pd.read_csv(file_path)
+        
+        if skills_column not in df.columns:
+            return f"Error: Column '{skills_column}' not found in data"
+        if location_column not in df.columns:
+            return f"Error: Column '{location_column}' not found in data"
+        
+        # Parse skills and create location-skill matrix
+        location_skills = defaultdict(list)
+        all_skills = Counter()
+        
+        for _, row in df.iterrows():
+            location = row[location_column]
+            skills_str = row[skills_column]
+            
+            if pd.isna(location) or pd.isna(skills_str):
+                continue
+                
+            skills = [skill.strip() for skill in str(skills_str).split(',') if skill.strip()]
+            location_skills[location].extend(skills)
+            all_skills.update(skills)
+        
+        # Get top skills and locations
+        top_skills_list = [skill for skill, _ in all_skills.most_common(top_skills)]
+        
+        # Calculate location totals and get top locations
+        location_totals = {loc: len(skills) for loc, skills in location_skills.items()}
+        top_locations_list = sorted(location_totals.keys(), key=lambda x: location_totals[x], reverse=True)[:top_locations]
+        
+        # Create matrix
+        matrix_data = []
+        for location in top_locations_list:
+            location_skill_counts = Counter(location_skills[location])
+            total_skills_in_location = sum(location_skill_counts.values())
+            
+            row = []
+            for skill in top_skills_list:
+                # Calculate percentage of this skill in this location
+                percentage = (location_skill_counts[skill] / total_skills_in_location * 100) if total_skills_in_location > 0 else 0
+                row.append(percentage)
+            matrix_data.append(row)
+        
+        # Create DataFrame for heatmap
+        heatmap_df = pd.DataFrame(matrix_data, index=top_locations_list, columns=top_skills_list)
+        
+        # Create the heatmap
+        plt.figure(figsize=(max(12, len(top_skills_list) * 0.8), max(8, len(top_locations_list) * 0.6)))
+        sns.heatmap(heatmap_df, 
+                   annot=True, 
+                   fmt='.1f',
+                   cmap='YlOrRd',
+                   cbar_kws={'label': 'Skill Percentage (%)'},
+                   linewidths=0.5)
+        
+        plt.title(f'Skills Distribution Across Top {top_locations} Locations\n(Top {top_skills} Skills)')
+        plt.xlabel('Skills')
+        plt.ylabel('Locations')
+        plt.xticks(rotation=45, ha='right')
+        plt.yticks(rotation=0)
+        plt.tight_layout()
+        
+        # Save the plot
+        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        result = {
+            "skills_location_heatmap_created": True,
+            "top_skills_analyzed": len(top_skills_list),
+            "top_locations_analyzed": len(top_locations_list),
+            "skills_included": top_skills_list,
+            "locations_included": top_locations_list,
+            "output_file": output_path,
+            "file_size": Path(output_path).stat().st_size if Path(output_path).exists() else 0
+        }
+        
+        return json.dumps(result, indent=2)
+        
+    except Exception as e:
+        return f"Error creating skills-location heatmap: {str(e)}\n{traceback.format_exc()}"
+
+
+@mcp.tool()
+def analyze_salary_by_location_and_skills(file_path: str, salary_column: str, location_column: str, 
+                                        skills_column: str, output_path: Optional[str] = None) -> str:
+    """
+    Analyze salary statistics by location and skills combination.
+    
+    Args:
+        file_path: Path to the data file
+        salary_column: Column name containing salary information
+        location_column: Column name containing location information
+        skills_column: Column name containing comma-separated skills
+        output_path: Optional path to save the analysis results
+    
+    Returns:
+        Salary analysis by location and skills
+    """
+    try:
+        import pandas as pd
+        from pathlib import Path
+        from collections import defaultdict
+        import re
+        
+        # Load the data
+        file_extension = Path(file_path).suffix.lower()
+        if file_extension == '.csv':
+            df = pd.read_csv(file_path)
+        elif file_extension == '.json':
+            df = pd.read_json(file_path)
+        elif file_extension in ['.xlsx', '.xls']:
+            df = pd.read_excel(file_path)
+        elif file_extension == '.tsv':
+            df = pd.read_csv(file_path, sep='\t')
+        else:
+            df = pd.read_csv(file_path)
+        
+        # Validate columns exist
+        for col in [salary_column, location_column, skills_column]:
+            if col not in df.columns:
+                return f"Error: Column '{col}' not found in data"
+        
+        # Clean and convert salary data
+        def extract_salary(salary_str):
+            if pd.isna(salary_str):
+                return None
+            # Extract numbers from salary string (handle ranges by taking average)
+            numbers = re.findall(r'\d+(?:,\d{3})*(?:\.\d+)?', str(salary_str))
+            if len(numbers) == 0:
+                return None
+            elif len(numbers) == 1:
+                return float(numbers[0].replace(',', ''))
+            else:
+                # Take average of range
+                nums = [float(n.replace(',', '')) for n in numbers]
+                return sum(nums) / len(nums)
+        
+        df['salary_numeric'] = df[salary_column].apply(extract_salary)
+        
+        # Filter out rows with missing data
+        df_clean = df.dropna(subset=['salary_numeric', location_column, skills_column])
+        
+        if len(df_clean) == 0:
+            return "Error: No valid data rows found after cleaning"
+        
+        # Analyze by location
+        location_analysis = []
+        for location in df_clean[location_column].unique():
+            location_data = df_clean[df_clean[location_column] == location]
+            
+            salaries = location_data['salary_numeric']
+            location_stats = {
+                "location": location,
+                "job_count": len(location_data),
+                "avg_salary": round(salaries.mean(), 2),
+                "median_salary": round(salaries.median(), 2),
+                "min_salary": round(salaries.min(), 2),
+                "max_salary": round(salaries.max(), 2),
+                "std_salary": round(salaries.std(), 2)
+            }
+            location_analysis.append(location_stats)
+        
+        # Sort by average salary
+        location_analysis.sort(key=lambda x: x["avg_salary"], reverse=True)
+        
+        # Analyze by top skills
+        skill_salary_data = defaultdict(list)
+        
+        for _, row in df_clean.iterrows():
+            skills_str = row[skills_column]
+            salary = row['salary_numeric']
+            
+            if pd.isna(skills_str):
+                continue
+                
+            skills = [skill.strip() for skill in str(skills_str).split(',') if skill.strip()]
+            for skill in skills:
+                skill_salary_data[skill].append(salary)
+        
+        # Calculate skill statistics (only for skills with enough data points)
+        skill_analysis = []
+        for skill, salaries in skill_salary_data.items():
+            if len(salaries) >= 5:  # At least 5 data points
+                skill_stats = {
+                    "skill": skill,
+                    "job_count": len(salaries),
+                    "avg_salary": round(sum(salaries) / len(salaries), 2),
+                    "median_salary": round(sorted(salaries)[len(salaries)//2], 2),
+                    "min_salary": round(min(salaries), 2),
+                    "max_salary": round(max(salaries), 2)
+                }
+                skill_analysis.append(skill_stats)
+        
+        # Sort by average salary
+        skill_analysis.sort(key=lambda x: x["avg_salary"], reverse=True)
+        
+        # Save analysis if output path provided
+        if output_path:
+            analysis_data = {
+                "location_analysis": location_analysis,
+                "skill_analysis": skill_analysis[:50]  # Top 50 skills
+            }
+            
+            if output_path.endswith('.json'):
+                with open(output_path, 'w') as f:
+                    json.dump(analysis_data, f, indent=2)
+            else:
+                # Create separate sheets for locations and skills
+                with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+                    pd.DataFrame(location_analysis).to_excel(writer, sheet_name='Locations', index=False)
+                    pd.DataFrame(skill_analysis).to_excel(writer, sheet_name='Skills', index=False)
+        
+        result = {
+            "salary_analysis_completed": True,
+            "locations_analyzed": len(location_analysis),
+            "skills_analyzed": len(skill_analysis),
+            "total_jobs_analyzed": len(df_clean),
+            "top_paying_locations": location_analysis[:10],
+            "top_paying_skills": skill_analysis[:15],
+            "output_file": output_path if output_path else None
+        }
+        
+        return json.dumps(result, indent=2)
+        
+    except Exception as e:
+        return f"Error analyzing salary by location and skills: {str(e)}\n{traceback.format_exc()}"
 
 
 def main():

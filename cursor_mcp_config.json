@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "visidata-local": {
+      "command": "/Users/moe/Dev/visidata-mcp/venv/bin/visidata-mcp",
+      "args": [],
+      "env": {
+        "PYTHONPATH": "/Users/moe/Dev/visidata-mcp/src"
+      }
+    }
+  }
+} 
